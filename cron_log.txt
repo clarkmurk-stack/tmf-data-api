@@ -1,0 +1,20 @@
+[main bcc6215] Auto update TMF data: 2026-09-11 16:28
+ 3 files changed, 1 insertion(+), 1 deletion(-)
+ create mode 100644 cron_log.txt
+failed to store: -61
+To https://github.com/clarkmurk-stack/tmf-data-api.git
+   6ece999..bcc6215  main -> main
+🚀 開始從期交所下載微台指資料...
+✅ 成功取得 2026_09_04 微台指資料！(自動鎖定主力合約: 202609)
+✅ 成功取得 2026_09_07 微台指資料！(自動鎖定主力合約: 202609)
+✅ 成功取得 2026_09_08 微台指資料！(自動鎖定主力合約: 202609)
+✅ 成功取得 2026_09_09 微台指資料！(自動鎖定主力合約: 202609)
+✅ 成功取得 2026_09_10 微台指資料！(自動鎖定主力合約: 202609)
+✅ 成功取得 2026_09_11 微台指資料！(自動鎖定主力合約: 202609)
+⏳ 正在轉換為 1分鐘 K線並存檔...
+🎉 檔案已成功更新至：/Users/pingchunkao/Downloads/githublo/tmf-data-api
+⚠️ Google Drive 備份失敗，請檢查路徑: [Errno 11] Resource deadlock avoided: '/Users/pingchunkao/Library/CloudStorage/GoogleDrive-clarkmurk@gmail.com/我的雲端硬碟/kTra/微冰不加4.xlsx'
+🌐 準備將資料同步至 GitHub...
+執行成功: git add .
+執行成功: git commit -m Auto update TMF data: 2026-09-11 16:28
+✨ 全部流程執行完畢！您可以去 GitHub 檢查最新檔案了。

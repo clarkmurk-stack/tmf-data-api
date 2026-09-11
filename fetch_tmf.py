@@ -38,13 +38,11 @@ while current_date <= end_date:
                     df_tmf = df[df['商品代號'] == 'TMF'].copy()
                     
                     if not df_tmf.empty:
-                        # 🌟 修正重點：清理月份欄位，自動鎖定當天交易筆數最多的「主力合約」
+                        # 自動鎖定主力合約
                         df_tmf['到期月份(週別)'] = df_tmf['到期月份(週別)'].str.strip()
                         main_month = df_tmf['到期月份(週別)'].value_counts().idxmax()
                         
-                        # 剔除跨月價差合約與遠月合約，只保留主力
                         df_tmf_main = df_tmf[df_tmf['到期月份(週別)'] == main_month].copy()
-                        
                         all_data.append(df_tmf_main)
                         print(f"✅ 成功取得 {date_str} 微台指資料！(自動鎖定主力合約: {main_month})")
     except Exception:
@@ -64,7 +62,7 @@ if all_data:
     df_all['成交時間'] = df_all['成交時間'].astype(str).str.zfill(6)
     df_all['datetime'] = pd.to_datetime(df_all['成交日期'] + ' ' + df_all['成交時間'], format='%Y%m%d %H%M%S')
     
-    # 🌟 防呆機制：過濾掉任何低於 20000 點的異常價格（徹底消滅 150 等價差雜訊）
+    # 兩萬點防禦過濾
     df_all['成交價格'] = pd.to_numeric(df_all['成交價格'], errors='coerce')
     df_all = df_all[df_all['成交價格'] > 20000]
     
@@ -97,8 +95,17 @@ if all_data:
     drive_folder = '/Users/pingchunkao/Library/CloudStorage/GoogleDrive-clarkmurk@gmail.com/我的雲端硬碟/kTra'
     
     try:
-        shutil.copy('微冰不加4.xlsx', f"{drive_folder}/微冰不加4.xlsx")
-        shutil.copy('微冰不加4.json', f"{drive_folder}/微冰不加4.json")
+        excel_dest = f"{drive_folder}/微冰不加4.xlsx"
+        json_dest = f"{drive_folder}/微冰不加4.json"
+        
+        # 🌟 破解 macOS 雲端死結：如果舊檔案存在，先把它刪除！
+        if os.path.exists(excel_dest):
+            os.remove(excel_dest)
+        if os.path.exists(json_dest):
+            os.remove(json_dest)
+            
+        shutil.copy('微冰不加4.xlsx', excel_dest)
+        shutil.copy('微冰不加4.json', json_dest)
         print("📁 雙重備份成功！檔案已同步放入 Google Drive 的 kTra 資料夾。")
     except Exception as e:
         print(f"⚠️ Google Drive 備份失敗，請檢查路徑: {e}")
@@ -111,11 +118,7 @@ if all_data:
     
     try:
         subprocess.run(['git', 'add', '.'], check=True)
-        print("執行成功: git add .")
-        
         subprocess.run(['git', 'commit', '-m', f'Auto update TMF data: {current_time}'], check=True)
-        print(f"執行成功: git commit -m Auto update TMF data: {current_time}")
-        
         subprocess.run(['git', 'push'], check=True)
         print("✨ 全部流程執行完畢！您可以去 GitHub 檢查最新檔案了。")
     except subprocess.CalledProcessError as e:
