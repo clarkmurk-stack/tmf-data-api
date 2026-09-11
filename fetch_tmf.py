@@ -38,8 +38,15 @@ while current_date <= end_date:
                     df_tmf = df[df['商品代號'] == 'TMF'].copy()
                     
                     if not df_tmf.empty:
-                        all_data.append(df_tmf)
-                        print(f"✅ 成功取得 {date_str} 的微台指資料！")
+                        # 🌟 修正重點：清理月份欄位，自動鎖定當天交易筆數最多的「主力合約」
+                        df_tmf['到期月份(週別)'] = df_tmf['到期月份(週別)'].str.strip()
+                        main_month = df_tmf['到期月份(週別)'].value_counts().idxmax()
+                        
+                        # 剔除跨月價差合約與遠月合約，只保留主力
+                        df_tmf_main = df_tmf[df_tmf['到期月份(週別)'] == main_month].copy()
+                        
+                        all_data.append(df_tmf_main)
+                        print(f"✅ 成功取得 {date_str} 微台指資料！(自動鎖定主力合約: {main_month})")
     except Exception:
         pass # 遇到假日或無資料則略過
         
@@ -56,7 +63,11 @@ if all_data:
     df_all['成交日期'] = df_all['成交日期'].str.strip()
     df_all['成交時間'] = df_all['成交時間'].astype(str).str.zfill(6)
     df_all['datetime'] = pd.to_datetime(df_all['成交日期'] + ' ' + df_all['成交時間'], format='%Y%m%d %H%M%S')
+    
+    # 🌟 防呆機制：過濾掉任何低於 20000 點的異常價格（徹底消滅 150 等價差雜訊）
     df_all['成交價格'] = pd.to_numeric(df_all['成交價格'], errors='coerce')
+    df_all = df_all[df_all['成交價格'] > 20000]
+    
     df_all['成交數量(B+S)'] = pd.to_numeric(df_all['成交數量(B+S)'], errors='coerce') // 2
     
     df_all.set_index('datetime', inplace=True)
